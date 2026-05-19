@@ -96,24 +96,24 @@ class AuthService {
             return ['success' => false, 'message' => 'Email, username, and password are required'];
         }
 
-        // Validate email format
+        // Vérifier le format de l'email
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
             return ['success' => false, 'message' => 'Invalid email format'];
         }
 
-        // Validate username format and security
+        // Vérifier le format du pseudo et la sécurité
         $usernameValidation = $this->validateUsername($username);
         if (!$usernameValidation['valid']) {
             return ['success' => false, 'message' => $usernameValidation['message']];
         }
 
-        // Validate password security (CNIL requirements)
+        // Vérifier la sécurité du mot de passe (exigences CNIL)
         $passwordValidation = $this->validatePassword($password);
         if (!$passwordValidation['valid']) {
             return ['success' => false, 'message' => $passwordValidation['message']];
         }
 
-        // Check if user already exists
+        // Vérifier si l'utilisateur exist déjà
         $stmt = $this->pdo->prepare('SELECT id FROM users WHERE email = ? OR username = ?');
         $stmt->execute([$email, $username]);
         
@@ -121,10 +121,10 @@ class AuthService {
             return ['success' => false, 'message' => 'Email or username already exists'];
         }
 
-        // Hash password
+        // Hacher le mot de passe
         $hashedPassword = password_hash($password, PASSWORD_BCRYPT, ['cost' => 12]);
 
-        // Insert user
+        // Inserer l'utilisateur
         try {
             $stmt = $this->pdo->prepare('INSERT INTO users (email, username, password, role) VALUES (?, ?, ?, ?)');
             $stmt->execute([$email, $username, $hashedPassword, 'player']);
@@ -171,7 +171,7 @@ class AuthService {
             return ['valid' => false, 'message' => 'Username must be at most 20 characters'];
         }
 
-        // Check for valid characters only (alphanumeric, hyphen, underscore)
+        // Vérifier les caractères valides (alphanumérique, tiret, underscore)
         if (!preg_match('/^[a-zA-Z0-9_-]+$/', $username)) {
             return ['valid' => false, 'message' => 'Username can only contain letters, numbers, hyphens, and underscores'];
         }
@@ -181,7 +181,7 @@ class AuthService {
             return ['valid' => false, 'message' => 'Username cannot start or end with hyphen or underscore'];
         }
 
-        // Check for spaces (should already be caught by regex, but be explicit)
+        // Vérifier les espaces (déjà attrapé par regex, mais soyons explicites)
         if (strpos($username, ' ') !== false) {
             return ['valid' => false, 'message' => 'Username cannot contain spaces'];
         }
@@ -230,7 +230,7 @@ class AuthService {
             return ['success' => false, 'message' => 'Email and password are required'];
         }
 
-        // Get user from database with ban/suspend fields
+        // Récupérer l'utilisateur de la base de donnees avec les champs de ban/suspension
         $stmt = $this->pdo->prepare('
             SELECT id, email, username, password, role, is_suspended, is_banned, 
                    banned_at, ban_expires_at, ban_reason, suspend_reason, avatar_id, username_changed_at, created_at 
@@ -244,7 +244,7 @@ class AuthService {
             return ['success' => false, 'message' => 'Invalid email or password'];
         }
 
-        // Check if ban has expired
+        // Vérifier si le ban a expiré
         if ($user['is_banned'] && $user['ban_expires_at']) {
             $banExpires = strtotime($user['ban_expires_at']);
             if (time() > $banExpires) {
@@ -260,15 +260,15 @@ class AuthService {
             }
         }
 
-        // Check if user is banned (allow login but will show ban modal)
-        // User can only access tickets when banned
+        // Vérifier si l'utilisateur est banni (permettre la connexion mais affichera le modal de ban)
+        // L'utilisateur ne peut acceder aux tickets que s'il est banni
         
-        // Verify password
+        // Verifier le mot de passe
         if (!password_verify($password, $user['password'])) {
             return ['success' => false, 'message' => 'Invalid email or password'];
         }
 
-        // Generate JWT token
+        // Generer un token JWT
         $token = $this->generateJWT([
             'userId' => $user['id'],
             'email' => $user['email'],
@@ -328,17 +328,17 @@ class AuthService {
 
         list($header, $payload, $signature) = $parts;
 
-        // Verify signature
+        // Vérifier la signature
         $expectedSignature = base64_encode(hash_hmac('sha256', "$header.$payload", $this->jwtSecret, true));
         
         if (!hash_equals($signature, $expectedSignature)) {
             return ['success' => false, 'message' => 'Invalid token signature'];
         }
 
-        // Decode payload
+        // Decoder le payload
         $decodedPayload = json_decode(base64_decode($payload), true);
 
-        // Check expiration
+        // Vérifier l'expiration
         if ($decodedPayload['exp'] < time()) {
             return ['success' => false, 'message' => 'Token has expired'];
         }
@@ -371,7 +371,7 @@ class AuthService {
             return ['success' => false, 'message' => 'User not found'];
         }
 
-        // Check if ban has expired
+        // Vérifier si le ban a expiré
         if ($user['is_banned'] && $user['ban_expires_at']) {
             $banExpires = strtotime($user['ban_expires_at']);
             if (time() > $banExpires) {
@@ -387,7 +387,7 @@ class AuthService {
             }
         }
 
-        // Return user with full status (do NOT block suspended/banned users here)
+        // Retourner l'utilisateur avec le statut complet (ne pas bloquer les utilis suspendus/bannis ici)
         // The frontend will show appropriate modals and block actions
         return [
             'success' => true, 
@@ -730,3 +730,4 @@ class AuthService {
         return ['success' => true, 'message' => 'Logout successful'];
     }
 }
+

@@ -250,3 +250,4 @@ class AppearanceOptionsService {
         return $value;
     }
 }
+

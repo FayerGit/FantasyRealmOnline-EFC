@@ -1,9 +1,5 @@
 <?php
-/**
- * Service MongoDB
- * Gère la connexion et les opérations avec MongoDB (base NoSQL pour les logs/activités)
- * Exigence ECF : Intégration d'une base NoSQL en parallèle de MySQL
- */
+// Service MongoDB pour la journalisation des activités
 
 // Charger l'autoloader Composer pour la bibliothèque MongoDB
 $autoloaderPath = __DIR__ . '/../vendor/autoload.php';
@@ -17,43 +13,26 @@ class MongoDBService {
     private $available = false;
     
     public function __construct() {
-        try {
-            // URI de connexion MongoDB
-            // Format : mongodb://[username[:password]@]hôte[:port][/[base_de_données][?options]]
-            // Par défaut : MongoDB local sans authentification
-            $uri = getenv('MONGODB_URI') ?: 'mongodb://127.0.0.1:27017';
-            $dbName = 'fantasy_realm_logs';
+        // URI MongoDB depuis env ou defaut local
+        $uri = getenv('MONGODB_URI') ?: 'mongodb://127.0.0.1:27017';
+        $dbName = 'fantasy_realm_logs';
 
-            if (!class_exists('MongoDB\\Client')) {
-                error_log('MongoDB PHP library not available (MongoDB\\Client class not found)');
-                return;
-            }
-            
-            // Créer le client MongoDB
+        if (!class_exists('MongoDB\Client')) {
+            throw new RuntimeException('MongoDB PHP library is required (MongoDB\\Client class not found)');
+        }
+
+        try {
             $this->connection = new MongoDB\Client($uri);
             $this->database = $this->connection->selectDatabase($dbName);
-            
-            // Vérifier la connexion en exécutant une commande ping
             $this->database->command(['ping' => 1]);
             $this->available = true;
-            
         } catch (Throwable $e) {
-            error_log("MongoDB Connection Error: " . $e->getMessage());
-            $this->available = false;
+            error_log('MongoDB Connection Error: ' . $e->getMessage());
+            throw new RuntimeException('MongoDB is required for this application', 0, $e);
         }
     }
     
-    /**
-     * Insérer une entrée de log dans MongoDB
-     * Enregistre les actions des utilisateurs pour le suivi et la supervision admin
-     * 
-     * @param string $userId User ID who performed the action
-     * @param string $action Type of action (e.g., 'character_created', 'comment_posted')
-     * @param string $targetType Type of entity affected (e.g., 'character', 'comment', 'user')
-     * @param int $targetId ID of the affected entity
-     * @param array $details Additional context data
-     * @return bool Success status
-     */
+    // Enregistrer les actions de l'utilisateur dans MongoDB
     public function logAction($userId, $action, $targetType, $targetId, $details = []) {
         if (!$this->available || !$this->database) {
             return false;
@@ -83,16 +62,7 @@ class MongoDBService {
         }
     }
     
-    /**
-     * Récupérer les logs d'activité avec filtrage et pagination
-     * Utilisé par le tableau de bord admin pour la surveillance
-     * 
-     * @param array $filters Search criteria
-     * @param int $limit Number of records to fetch
-     * @param int $skip Offset for pagination
-     * @param array $sort Sort order
-     * @return array Activity logs
-     */
+    // Charger les journaux d'activité avec filtrage et pagination
     public function getActivityLogs($filters = [], $limit = 50, $skip = 0, $sort = ['timestamp' => -1]) {
         if (!$this->available || !$this->database) {
             return [];
@@ -141,7 +111,7 @@ class MongoDBService {
             $logs = [];
             
             foreach ($cursor as $document) {
-                // Convertir le document BSON en tableau PHP
+                // Convertir le document BSON en tabl ean PHP
                 $logArray = json_decode(json_encode($document->bsonSerialize()), true);
                 
                 // Convertir ObjectId en chaîne
@@ -149,7 +119,7 @@ class MongoDBService {
                     $logArray['_id'] = (string)$document['_id'];
                 }
                 
-                // Convertir le timestamp en format lisible
+                // Convertir le timestamp en format lisible humain
                 if (isset($document['timestamp'])) {
                     $logArray['timestamp'] = date('Y-m-d H:i:s', $document['timestamp']->toDateTime()->getTimestamp());
                 }
@@ -179,7 +149,7 @@ class MongoDBService {
         try {
             $collection = $this->database->selectCollection('activity_logs');
             
-            // Calculer la plage de dates
+            // Calculer la plage de dates pour le filtre
             switch ($period) {
                 case 'week':
                     $fromDate = time() - (7 * 86400);
@@ -350,3 +320,4 @@ class MongoDBService {
     }
 }
 ?>
+
