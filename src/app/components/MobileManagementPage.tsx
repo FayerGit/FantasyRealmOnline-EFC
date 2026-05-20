@@ -1,0 +1,1 @@
+export { ManagementPage as MobileManagementPage } from "./ManagementPage";

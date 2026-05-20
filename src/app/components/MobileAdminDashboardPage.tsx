@@ -1,0 +1,1 @@
+export { AdminDashboardPage as MobileAdminDashboardPage } from "./AdminDashboardPage";
