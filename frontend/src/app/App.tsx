@@ -8,10 +8,17 @@ import { UserProfilePage } from "./components/UserProfilePage";
 import { SettingsPage } from "./components/SettingsPage";
 import { ManagementPage } from "./components/ManagementPage";
 import { AdminDashboardPage } from "./components/AdminDashboardPage";
-// Composants UI mobiles supprimés (build uniquement desktop)
+import { MobileHomePage } from "./components/MobileHomePage";
+import { MobileLoginRegisterPage } from "./components/MobileLoginRegisterPage";
+import { MobileCharacterGalleryPage } from "./components/MobileCharacterGalleryPage";
+import { MobileCharacterCreationPage } from "./components/MobileCharacterCreationPage";
+import { MobileUserProfilePage } from "./components/MobileUserProfilePage";
+import { MobileSettingsPage } from "./components/MobileSettingsPage";
+import { MobileManagementPage } from "./components/MobileManagementPage";
+import { MobileAdminDashboardPage } from "./components/MobileAdminDashboardPage";
 import { AshEffect } from "./components/AshEffect";
 import { BanModal } from "./components/BanModal";
-// Hook de détection mobile supprimé
+import { useIsMobile } from "./components/ui/use-mobile";
 import { authAPI } from "./services/authAPI";
 import { useLanguage } from "./i18n/language";
 
@@ -26,12 +33,12 @@ function App() {
   const [suspendReason, setSuspendReason] = useState<string | undefined>();
   const [bannedAt, setBannedAt] = useState<string | null | undefined>();
   const [username, setUsername] = useState("");
-  // Détection mobile supprimée — rendre toujours les pages desktop
+  const isMobile = useIsMobile();
   
-  // Pages nécessitant authentification
+  // Pages that require authentication
   const protectedPages: Page[] = ["gallery", "create", "profile", "settings", "management", "admin"];
   
-  // Vérifier si l'utilisateur est déjà authentifié au montage
+  // Check if user is already authenticated on mount
   useEffect(() => {
     const checkAuth = async () => {
       try {
@@ -57,7 +64,7 @@ function App() {
                 suspend_reason: user.suspend_reason,
               });
               
-              // Vérifier l'état de ban/suspension
+              // Check ban/suspend status
               setUsername(user.username);
               setIsBanned(user.is_banned || false);
               setIsSuspended(user.is_suspended || false);
@@ -66,7 +73,7 @@ function App() {
               setBannedAt(user.banned_at);
             }
           } else {
-            // Le token est invalide ou a expiré
+            // Token is invalid or expired
             authAPI.removeToken();
             authAPI.removeUser();
             setIsLoggedIn(false);
@@ -86,7 +93,7 @@ function App() {
   }, []);
   
   const handleNavigate = (page: Page) => {
-    // Si la page est protégée et que l'utilisateur n'est pas connecté, rediriger vers la page de connexion
+    // If the page is protected and the user is not logged in, redirect to login
     if (protectedPages.includes(page) && !isLoggedIn) {
       setCurrentPage("login");
       return;
@@ -152,20 +159,41 @@ function App() {
     }
   };
 
-  // Fonction de rendu mobile supprimée
+  const renderMobilePage = () => {
+    switch (currentPage) {
+      case "home":
+        return <MobileHomePage onNavigate={handleNavigate} isLoggedIn={isLoggedIn} onLogout={handleLogout} />;
+      case "login":
+        return <MobileLoginRegisterPage onNavigate={handleNavigate} onLogin={handleLogin} />;
+      case "gallery":
+        return <MobileCharacterGalleryPage onNavigate={handleNavigate} isLoggedIn={isLoggedIn} onLogout={handleLogout} />;
+      case "create":
+        return <MobileCharacterCreationPage onNavigate={handleNavigate} isLoggedIn={isLoggedIn} onLogout={handleLogout} />;
+      case "profile":
+        return <MobileUserProfilePage onNavigate={handleNavigate} isLoggedIn={isLoggedIn} onLogout={handleLogout} />;
+      case "settings":
+        return <MobileSettingsPage onNavigate={handleNavigate} isLoggedIn={isLoggedIn} onLogout={handleLogout} />;
+      case "management":
+        return <MobileManagementPage onNavigate={handleNavigate} isLoggedIn={isLoggedIn} onLogout={handleLogout} />;
+      case "admin":
+        return <MobileAdminDashboardPage onNavigate={handleNavigate} isLoggedIn={isLoggedIn} onLogout={handleLogout} />;
+      default:
+        return <MobileHomePage onNavigate={handleNavigate} isLoggedIn={isLoggedIn} onLogout={handleLogout} />;
+    }
+  };
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] p-4">
       <div className="max-w-7xl mx-auto">
-        {renderDesktopPage()}
+        {isMobile ? renderMobilePage() : renderDesktopPage()}
         <AshEffect />
         
-        {/* Modal de ban - Non fermable */}
+        {/* Ban Modal - Non-closable */}
         {isLoggedIn && isBanned && (
           <BanModal banReason={banReason} username={username} bannedAt={bannedAt} />
         )}
         
-        {/* Notification de suspension */}
+        {/* Suspend Notification */}
         {isLoggedIn && isSuspended && !isBanned && (
           <div className="fixed top-4 left-1/2 -translate-x-1/2 z-[9999] w-full max-w-2xl px-4">
             <div className="border border-yellow-600/40 bg-yellow-950/30 p-4 backdrop-blur-sm">

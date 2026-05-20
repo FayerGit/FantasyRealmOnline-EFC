@@ -14,7 +14,7 @@ interface CharacterCreationPageProps {
   onLogout?: () => void;
 }
 
-// Options pour chaque attribut (preparer pour le remplacement de pixel art)
+// Options for each attribute (prepare for pixel art replacement)
 const DEFAULT_BODY_TYPES = ["human"];
 const DEFAULT_HAIR_STYLES = ["none"];
 const DEFAULT_EYE_TYPES = ["none"];
@@ -374,7 +374,7 @@ export function CharacterCreationPage({ onNavigate, isLoggedIn, onLogout }: Char
     rightHandItems,
   ]);
 
-  // Aides pour parcourir les options
+  // Helpers for cycling through options
   const cycleOption = (current: number, max: number, direction: 1 | -1) => {
     const next = current + direction;
     if (next < 0) return max - 1;
@@ -437,7 +437,7 @@ export function CharacterCreationPage({ onNavigate, isLoggedIn, onLogout }: Char
 
     console.log("Creating character:", characterData);
     
-    // Appeler l'API
+    // Call the API
     const result = editingCharacterId
       ? await characterAPI.updateCharacter(editingCharacterId, characterData)
       : await characterAPI.create(characterData);
@@ -457,7 +457,7 @@ export function CharacterCreationPage({ onNavigate, isLoggedIn, onLogout }: Char
 
       window.dispatchEvent(new Event("notifications:changed"));
 
-      // Reinitialiser apres 2 secondes
+      // Reset after 2 seconds
       setTimeout(() => {
         if (editingCharacterId) {
           localStorage.removeItem("editingCharacter");

@@ -1,0 +1,1 @@
+export { CharacterGalleryPage as MobileCharacterGalleryPage } from "./CharacterGalleryPage";

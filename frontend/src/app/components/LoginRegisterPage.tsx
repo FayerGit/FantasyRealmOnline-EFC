@@ -28,7 +28,7 @@ export function LoginRegisterPage({ onNavigate, onLogin }: LoginRegisterPageProp
   const [loading, setLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
 
-  // États de validation pour le formulaire d'inscription
+  // Validation states for register form
   const [usernameError, setUsernameError] = useState("");
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
@@ -104,7 +104,8 @@ export function LoginRegisterPage({ onNavigate, onLogin }: LoginRegisterPageProp
     setPasswordError(validation.valid ? "" : "");
     setPasswordChecks(validation.message);
     
-    // Vérifier si les mots de passe correspondent
+    // Check password match
+    if (registerConfirmPassword) {
       const matchValidation = validatePasswordMatch(value, registerConfirmPassword);
       setPasswordMatchError(matchValidation.valid ? "" : matchValidation.message);
     }
@@ -120,7 +121,7 @@ export function LoginRegisterPage({ onNavigate, onLogin }: LoginRegisterPageProp
     setError("");
     setSuccessMessage("");
 
-    // Valider tous les champs avant d'envoyer
+    // Validate all fields before submission
     const emailValidation = validateEmail(registerEmail);
     const usernameValidation = validateUsername(registerUsername);
     const passwordValidation = validatePassword(registerPassword);

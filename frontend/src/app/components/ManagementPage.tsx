@@ -97,25 +97,25 @@ export function ManagementPage({ onNavigate, isLoggedIn, onLogout }: ManagementP
   const [currentView, setCurrentView] = useState<ManagementView>("characters");
   const [feedback, setFeedback] = useState<{ type: "success" | "error"; message: string } | null>(null);
 
-  // État des personnages
+  // Characters State
   const [characters, setCharacters] = useState<Character[]>([]);
   const [characterError, setCharacterError] = useState<string | null>(null);
 
-  // État des commentaires
+  // Comments State
   const [comments, setComments] = useState<Comment[]>([]);
   const [commentError, setCommentError] = useState<string | null>(null);
 
-  // État des accessoires
+  // Accessories State
   const [accessories, setAccessories] = useState<Accessory[]>([]);
   const [accessoryError, setAccessoryError] = useState<string | null>(null);
   const [isLoadingAccessories, setIsLoadingAccessories] = useState(false);
 
-  // État des utilisateurs
+  // Users State
   const [users, setUsers] = useState<User[]>([]);
   const [userError, setUserError] = useState<string | null>(null);
   const [isLoadingUsers, setIsLoadingUsers] = useState(false);
 
-  // État du formulaire d'accessoire
+  // Accessory Form State
   const [accessoryForm, setAccessoryForm] = useState({ name: "", type: "", imageUrl: "" });
   const [accessoryImageFile, setAccessoryImageFile] = useState<File | null>(null);
   const [isUploadingImage, setIsUploadingImage] = useState(false);
@@ -128,14 +128,14 @@ export function ManagementPage({ onNavigate, isLoggedIn, onLogout }: ManagementP
   const [confirmReason, setConfirmReason] = useState("");
   const [confirmReasonError, setConfirmReasonError] = useState<string | null>(null);
 
-  // État des tickets
+  // Tickets State
   const [tickets, setTickets] = useState<Ticket[]>([]);
   const [ticketError, setTicketError] = useState<string | null>(null);
   const [selectedTicket, setSelectedTicket] = useState<Ticket | null>(null);
   const [ticketReply, setTicketReply] = useState("");
   const [ticketFilter, setTicketFilter] = useState<string>("all");
 
-  // Charger les tickets
+  // Load tickets
   const loadTickets = async () => {
     const result = await ticketAPI.getAllTickets(ticketFilter);
     if (result.error) {
@@ -225,7 +225,7 @@ export function ManagementPage({ onNavigate, isLoggedIn, onLogout }: ManagementP
         setSupportedCategories(categories.slice().sort());
       }
     } catch {
-      // Échouer silencieusement; utiliser une liste vide
+      // Silently fail; use empty list
     }
   };
 
@@ -296,7 +296,7 @@ export function ManagementPage({ onNavigate, isLoggedIn, onLogout }: ManagementP
     loadCharacters();
     loadComments();
     
-    // Charger les tickets seulement en les consultant
+    // Load tickets only when viewing tickets
     if (currentView === "tickets") {
       loadTickets();
     }
@@ -331,7 +331,7 @@ export function ManagementPage({ onNavigate, isLoggedIn, onLogout }: ManagementP
     return true;
   };
 
-  // Actions sur les personnages
+  // Character Actions
   const handleApproveCharacter = async (id: number) => {
     if (!ensureCanAct()) return;
     const character = characters.find(c => c.id === id);
@@ -357,7 +357,7 @@ export function ManagementPage({ onNavigate, isLoggedIn, onLogout }: ManagementP
     setRejectReason("");
   };
 
-  // Actions sur les commentaires
+  // Comment Actions
   const handleApproveComment = async (id: number) => {
     if (!ensureCanAct()) return;
     const comment = comments.find(c => c.id === id);
@@ -459,6 +459,8 @@ export function ManagementPage({ onNavigate, isLoggedIn, onLogout }: ManagementP
       }
     });
     
+    // TODO: API call
+    // await fetch(`/api/management/comments/${id}`, { method: 'DELETE' });
   };
 
   const handleFlagComment = (id: number) => {
@@ -466,9 +468,11 @@ export function ManagementPage({ onNavigate, isLoggedIn, onLogout }: ManagementP
     setComments(comments.map(c => c.id === id ? { ...c, status: "flagged" as const } : c));
     setFeedback({ type: "success", message: `Comment flagged for review` });
     
+    // TODO: API call
+    // await fetch(`/api/management/comments/${id}/flag`, { method: 'POST' });
   };
 
-  // Actions sur les tickets
+  // Ticket Actions
   const handleViewTicket = async (id: number) => {
     const result = await ticketAPI.getTicket(id);
     if (result.error) {
@@ -495,7 +499,7 @@ export function ManagementPage({ onNavigate, isLoggedIn, onLogout }: ManagementP
     setFeedback({ type: "success", message: "Reply sent" });
     setTicketReply("");
     
-    // Recharger le ticket pour afficher le nouveau message
+    // Reload ticket to show new message
     await handleViewTicket(selectedTicket.id);
   };
 
@@ -523,7 +527,7 @@ export function ManagementPage({ onNavigate, isLoggedIn, onLogout }: ManagementP
       return;
     }
 
-    // Recharger les tickets pour obtenir assigned_to_username mis à jour
+    // Reload tickets to get updated assigned_to_username
     await loadTickets();
     if (selectedTicket && selectedTicket.id === id) {
       await handleViewTicket(id);
@@ -581,7 +585,7 @@ export function ManagementPage({ onNavigate, isLoggedIn, onLogout }: ManagementP
     setTicketError(null);
   };
 
-  // Actions sur les accessoires
+  // Accessory Actions
   const uploadAccessoryImage = async (
     file: File,
     meta?: { category?: string; name?: string }
@@ -649,6 +653,9 @@ export function ManagementPage({ onNavigate, isLoggedIn, onLogout }: ManagementP
     setShowAccessoryForm(false);
 
     await loadAccessories();
+    
+    // TODO: API call
+    // await fetch('/api/management/accessories', { method: 'POST', body: JSON.stringify(newAccessory) });
   };
 
   const handleEditAccessory = async () => {
@@ -680,6 +687,9 @@ export function ManagementPage({ onNavigate, isLoggedIn, onLogout }: ManagementP
     setShowAccessoryForm(false);
 
     await loadAccessories();
+    
+    // TODO: API call
+    // await fetch(`/api/management/accessories/${editingAccessory.id}`, { method: 'PUT', body: JSON.stringify(updatedAccessory) });
   };
 
   const handleDeleteAccessory = (id: number) => {
@@ -720,6 +730,9 @@ export function ManagementPage({ onNavigate, isLoggedIn, onLogout }: ManagementP
         }
       }
     });
+    
+    // TODO: API call
+    // await fetch(`/api/management/accessories/${id}`, { method: 'DELETE' });
   };
 
   const openEditAccessory = (accessory: Accessory) => {
@@ -730,7 +743,7 @@ export function ManagementPage({ onNavigate, isLoggedIn, onLogout }: ManagementP
     setFeedback(null);
   };
 
-  // Actions utilisateurs
+  // User Actions
   const canModerateUser = (target: User): boolean => {
     if (actorId != null && target.id === actorId) return false;
     return target.role === "player";
@@ -817,6 +830,9 @@ export function ManagementPage({ onNavigate, isLoggedIn, onLogout }: ManagementP
         setFeedback({ type: "success", message: `Data for user "${user.username}" deleted` });
       }
     });
+    
+    // TODO: API call
+    // await fetch(`/api/management/users/${id}/data`, { method: 'DELETE' });
   };
 
   const handleDeleteUserAccount = (id: number) => {

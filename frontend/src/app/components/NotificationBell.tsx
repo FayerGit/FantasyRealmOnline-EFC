@@ -34,7 +34,7 @@ export const NotificationBell = ({ isLoggedIn }: NotificationBellProps) => {
     setIsLoading(false);
   };
 
-  // Charger le nombre de messages non lus régulièrement
+  // Fetch unread count periodically
   useEffect(() => {
     if (!isLoggedIn) return;
 
@@ -44,7 +44,7 @@ export const NotificationBell = ({ isLoggedIn }: NotificationBellProps) => {
     return () => clearInterval(interval);
   }, [isLoggedIn]);
 
-  // Charger les notifications quand le menu s'ouvre
+  // Fetch notifications when dropdown opens
   useEffect(() => {
     if (isOpen && isLoggedIn) {
       fetchNotifications();

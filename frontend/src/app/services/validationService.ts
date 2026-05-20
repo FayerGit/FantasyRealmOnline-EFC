@@ -1,11 +1,21 @@
-// Utilitaires de validation des formulaires
+/**
+ * Utilitaires de validation de formulaire
+ * Fournit une validation côté client correspondant aux règles du backend
+ */
 
 export interface ValidationResult {
   valid: boolean;
   message: string;
 }
 
-// Pseudo: 3-20 caractères, alphanumérique + tiret/underscore, pas de tiret en début/fin
+/**
+ * Valider le format et la sécurité du nom d'utilisateur
+ * Règles :
+ * - 3 à 20 caractères
+ * - Seulement alphanumériques, tirets, underscores
+ * - Pas d'espaces ni de caractères spéciaux
+ * - Ne peut pas commencer ou finir par un tiret/underscore
+ */
 export const validateUsername = (username: string): ValidationResult => {
   username = username.trim();
 
@@ -30,7 +40,7 @@ export const validateUsername = (username: string): ValidationResult => {
     };
   }
 
-  // Peut pas commencer ou terminer par un tiret/underscore
+  // Ne peut pas commencer ou finir par un tiret/underscore
   if (username[0] === "-" || username[0] === "_") {
     return {
       valid: false,
@@ -58,7 +68,7 @@ export const validateEmail = (email: string): ValidationResult => {
     return { valid: false, message: "Email is required" };
   }
 
-  // Validation d'email simple
+  // Validation d'email basique
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!emailRegex.test(email)) {
     return { valid: false, message: "Invalid email format" };

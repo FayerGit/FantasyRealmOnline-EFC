@@ -22,7 +22,7 @@ export function AshEffect() {
       opacity: number;
     }> = [];
 
-    // Creer les particules
+    // Create particles
     for (let i = 0; i < 50; i++) {
       particles.push({
         x: Math.random() * canvas.width,
@@ -46,11 +46,11 @@ export function AshEffect() {
         ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
         ctx.fill();
 
-        // Mettre à jour la position
+        // Update position
         particle.y += particle.speedY;
         particle.x += particle.speedX;
 
-        // Reinitialiser la particule si elle sort de l'écran
+        // Reset particle if it goes off screen
         if (particle.y > canvas.height) {
           particle.y = -10;
           particle.x = Math.random() * canvas.width;

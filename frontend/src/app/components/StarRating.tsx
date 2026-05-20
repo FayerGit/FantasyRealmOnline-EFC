@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 
 interface StarRatingProps {
   rating: number; // Current rating (can be 0)
-  onRate?: (rating: number) => void; // Callback quand l'utilisateur selectionne une note
-  readOnly?: boolean; // Si vrai, affiche seulement la note
+  onRate?: (rating: number) => void; // Callback when user selects rating
+  readOnly?: boolean; // If true, only displays the rating
   size?: 'small' | 'medium' | 'large';
   disabled?: boolean;
 }

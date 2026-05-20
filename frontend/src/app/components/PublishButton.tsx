@@ -19,7 +19,7 @@ export const PublishButton: React.FC<PublishButtonProps> = ({ character, onPubli
   const [error, setError] = useState('');
   const [showSuccess, setShowSuccess] = useState(false);
 
-  // Afficher seulement si le personnage est approuvé
+  // Only show if character is approved
   if (character.status !== 'approved') {
     return null;
   }
