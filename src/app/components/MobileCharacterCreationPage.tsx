@@ -1,1 +1,0 @@
-export { CharacterCreationPage as MobileCharacterCreationPage } from "./CharacterCreationPage";

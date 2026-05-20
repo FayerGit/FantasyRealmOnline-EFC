@@ -1,1 +1,0 @@
-export { UserProfilePage as MobileUserProfilePage } from "./UserProfilePage";

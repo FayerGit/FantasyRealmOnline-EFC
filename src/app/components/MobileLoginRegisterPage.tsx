@@ -1,1 +1,0 @@
-export { LoginRegisterPage as MobileLoginRegisterPage } from "./LoginRegisterPage";
